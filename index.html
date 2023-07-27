@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verses</title>
-    <link href="/css/bootstrap.min.css" rel="stylesheet"
+    <link href="./css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <script src="/js/bootstrap.bundle.min.js"
+    <script src="./js/bootstrap.bundle.min.js"
         integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
         crossorigin="anonymous"></script>
 </head>
@@ -15,7 +15,7 @@
 <body dir="rtl">
     <nav class="navbar bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">Verses</a>
+            <a class="navbar-brand" href="./">Verses</a>
         </div>
     </nav>
     <!-- <br><br><br> -->
@@ -122,7 +122,7 @@
 
 
         var client = new XMLHttpRequest();
-        client.open('GET', '/verses.txt');
+        client.open('GET', './verses.txt');
         client.onreadystatechange = function () {
             text = client.responseText;
             initVerses(text);
