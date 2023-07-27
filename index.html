@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verses</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+</head>
+
+<body dir="rtl">
+    <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Verses</a>
+        </div>
+    </nav>
+    <!-- <br><br><br> -->
+    <div class="container-lg">
+        <!-- <h3 id="thankyou" style="display: none;">Thank you for reading. <a onclick="getVerse()">Read another?</a></h3> -->
+        <button class="btn btn-info w-100 my-2" onclick="getVerse()">Get another verse</button>
+        <div class="card ">
+            <div class="card-body">
+                <pre id="verse"></pre>
+            </div>
+        </div>
+        <button class="btn btn-success w-100 my-2" onclick="readVerse()">I have completed reading this verse</button>
+        <div class="progress-stacked ">
+            <div class="progress" role="progressbar" aria-label="Unread"  style="width: 0%" id="unreadbar">
+                <div class="progress-bar" id="unread"></div>
+            </div>
+            <div class="progress" role="progressbar" aria-label="Read" style="width: 0%" id="readbar">
+                <div class="progress-bar bg-success" id="read"></div>
+            </div>
+        </div>
+        <button class="btn btn-danger w-100 my-2" onclick="reset()">Reset my reading progress</button>
+    </div>
+    <script>
+        var text = "";
+        var dictverse = {};
+
+
+        var randomKey = function (obj) {
+            var keys = Object.keys(obj);
+            return keys[keys.length * Math.random() << 0];
+        };
+
+
+        const initVerses = (text) => {
+            var verses = Array.from(text.matchAll(/\d*-\d*/g));
+            for (var i = 0; i < verses.length; i++) {
+                var verse = verses[i][0];
+                try {
+                    var verseText = verses[i].input.substring(verses[i].index, verses[i + 1].index - 1);
+                } catch (err) {
+                    console.log(err);
+                    var verseText = verses[i].input.substring(verses[i].index, verses[i].input.length - 1);
+                }
+                dictverse[verse] = verseText;
+            }
+        }
+        
+        
+        const updateProgress = ()=>{
+            var readKeys = localStorage.getItem("readKeys") || "[]";
+            readKeys = JSON.parse(readKeys);
+            var unread = 0;
+            var read = 0;
+            for (var key in dictverse) {
+                if (readKeys.includes(key)) {
+                    read++;
+                } else {
+                    unread++;
+                }
+            }
+            var total = read + unread;
+            document.getElementById("unreadbar").style.width = `${unread/total*100}%`;
+            document.getElementById("readbar").style.width = `${read/total*100}%`;
+            document.getElementById("unread").innerHTML = `Unread: ${unread}`;
+            document.getElementById("read").innerHTML = `Read: ${read}`;
+        }
+
+
+        const getVerse = () => {
+            readKeys = localStorage.getItem("readKeys") || "[]";
+            readKeys = JSON.parse(readKeys);
+            selectedKey = randomKey(dictverse);
+            while (readKeys.includes(selectedKey)) {
+                selectedKey = randomKey(dictverse);
+            }
+            localStorage.setItem("selectedKey", selectedKey);
+            document.getElementById("verse").innerHTML = dictverse[randomKey(dictverse)];
+            updateProgress();
+        }
+
+
+        const readVerse = () => {
+            if (!localStorage.getItem("selectedKey")) {
+                alert("Please get a verse first");
+                return;
+            }
+            var selectedKey = localStorage.getItem("selectedKey");
+            var readKeys = localStorage.getItem("readKeys") || "[]";
+            var readKeys = JSON.parse(readKeys);
+            readKeys.push(selectedKey);
+            localStorage.setItem("readKeys", JSON.stringify(readKeys));
+            localStorage.removeItem("selectedKey");
+            document.getElementById("verse").innerHTML = "Thank you for reading. <a onclick='getVerse()'>Read another</a>";
+            updateProgress();
+        }
+
+
+        const reset = () => {
+            localStorage.removeItem("readKeys");
+            localStorage.removeItem("selectedKey");
+            getVerse();
+            updateProgress();
+        }
+
+
+        var client = new XMLHttpRequest();
+        client.open('GET', '/verses.txt');
+        client.onreadystatechange = function () {
+            text = client.responseText;
+            initVerses(text);
+        }
+        client.send();
+    </script>
+</body>
+
+</html>
