@@ -88,6 +88,10 @@
             readKeys = localStorage.getItem("readKeys") || "[]";
             readKeys = JSON.parse(readKeys);
             selectedKey = randomKey(dictverse);
+            if(readKeys.length == Object.keys(dictverse).length){
+                alert("You have read all the verses. Please reset your progress to read again.");
+                return;
+            }
             while (readKeys.includes(selectedKey)) {
                 selectedKey = randomKey(dictverse);
             }
